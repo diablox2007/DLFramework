@@ -14,6 +14,15 @@ namespace com.dl.framework
             DLLogger.Log("DLFramework initializing...");
             try
             {
+                // 配置管理
+                ConfigManager.Instance.Initialize();
+
+                // 数据管理
+                DataManager.Instance.Initialize();
+
+                // 资源管理
+                ResourceManager.Instance.Initialize();
+
                 // 事件系统
                 EventSystem.Instance.Initialize();
 
@@ -23,17 +32,8 @@ namespace com.dl.framework
                 // 协程管理
                 CoroutineManager.Instance.Initialize();
 
-                // 资源管理
-                ResourceManager.Instance.Initialize();
-
                 // 对象池
                 PoolManager.Instance.Initialize();
-
-                // 数据管理
-                DataManager.Instance.Initialize();
-
-                // 配置管理
-                ConfigManager.Instance.Initialize();
 
                 // UI管理
                 WindowManager.Instance.Initialize();

@@ -115,6 +115,19 @@ namespace com.dl.framework.editor
             Repaint();
         }
 
+        protected virtual void OnDisable()
+        {
+            if (isDirty)
+            {
+                if (EditorUtility.DisplayDialog("Unsaved Changes",
+                    "You have unsaved changes. Would you like to save them?",
+                    "Yes", "No"))
+                {
+                    SaveModule();
+                }
+            }
+        }
+
         // 子类必须实现的绘制方法
         protected abstract void DrawModuleGUI();
     }

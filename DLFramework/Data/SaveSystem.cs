@@ -101,7 +101,7 @@ namespace com.dl.framework
             }
         }
 
-        private static string DecryptString(string cipherText)
+        public static string DecryptString(string cipherText)
         {
             using (Aes aes = Aes.Create())
             {

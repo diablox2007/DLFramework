@@ -20,7 +20,7 @@ public class DataManager : Singleton<DataManager>
     [AttributeUsage(AttributeTargets.Class)]
     public class DataModuleAttribute : Attribute
     {
-        public int Priority { get; }
+        public int Priority { get; set; }
         public DataModuleAttribute(int priority = 0)
         {
             Priority = priority;
@@ -148,6 +148,8 @@ public class DataManager : Singleton<DataManager>
             {
                 module.Initialize();
                 DLLogger.Log($"[DataManager] Initialized module: {module.GetType().Name}");
+
+                module.Load();
             }
             catch (Exception e)
             {

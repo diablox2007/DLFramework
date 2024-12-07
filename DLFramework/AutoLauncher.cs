@@ -4,6 +4,7 @@ namespace com.dl.framework
 {
     public class AutoLauncher : MonoBehaviour
     {
+        // 特性：不需要手动调用，Unity引擎会自动执行这个方法 BeforeSceneLoad表示在任何场景加载之前执行
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void AutoInitialize()
         {

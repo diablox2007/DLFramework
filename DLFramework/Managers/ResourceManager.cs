@@ -10,7 +10,7 @@ namespace com.dl.framework
 
         protected override void OnInit()
         {
-            DLLogger.Log($"[{GetType().Name}] initialized.");
+            base.OnInit();
         }
 
         public T Load<T>(string path) where T : Object

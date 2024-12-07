@@ -13,7 +13,8 @@ namespace com.dl.framework
             GameObject root = new GameObject("[ObjectPools]");
             GameObject.DontDestroyOnLoad(root);
             poolRoot = root.transform;
-            DLLogger.Log($"[{GetType().Name}] initialized.");
+
+            base.OnInit();
         }
 
         public GameObject Spawn(string prefabPath, Vector3 position = default, Quaternion rotation = default)

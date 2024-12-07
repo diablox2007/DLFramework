@@ -83,7 +83,8 @@ namespace com.dl.framework
 
             // 应用音量设置
             UpdateBGMVolume();
-            DLLogger.Log($"[{GetType().Name}] initialized.");
+
+            base.OnInit();
         }
 
         private void Update()

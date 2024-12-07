@@ -1,3 +1,5 @@
+using com.dl.framework;
+
 public abstract class Singleton<T> where T : class, new()
 {
     private static T instance;
@@ -26,5 +28,5 @@ public abstract class Singleton<T> where T : class, new()
         OnInit();
     }
 
-    protected virtual void OnInit() { }
+    protected virtual void OnInit() { DLLogger.Log($"[{GetType().Name}] initialized."); }
 }

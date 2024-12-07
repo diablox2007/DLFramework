@@ -32,7 +32,7 @@ namespace com.dl.framework
                                 instance = go.AddComponent<T>();
                                 DontDestroyOnLoad(go);
 
-                                DLLogger.Log($"[Singleton] Created instance of {typeof(T)}");
+                                //DLLogger.Log($"[Singleton] Created instance of {typeof(T)}");
                             }
                         }
                     }
@@ -51,7 +51,7 @@ namespace com.dl.framework
         }
 
         private bool isInitialized = false;
-        protected virtual void OnInit() {  }
+        protected virtual void OnInit() { DLLogger.Log($"[{GetType().Name}] initialized."); }
 
         protected virtual void Awake()
         {
@@ -59,7 +59,7 @@ namespace com.dl.framework
             {
                 instance = this as T;
                 DontDestroyOnLoad(gameObject);
-                DLLogger.Log($"[Singleton] Instance '{typeof(T)}' set in Awake");
+                //DLLogger.Log($"[Singleton] Instance '{typeof(T)}' set in Awake");
             }
             else if (instance != this)
             {

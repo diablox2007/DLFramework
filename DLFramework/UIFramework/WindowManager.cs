@@ -15,7 +15,8 @@ namespace com.dl.framework
         {
             InitializeCanvas();
             InitializeLayers();
-            DLLogger.Log($"[{GetType().Name}] initialized.");
+
+            base.OnInit();
         }
 
         private void InitializeCanvas()

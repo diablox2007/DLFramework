@@ -8,7 +8,7 @@ namespace com.dl.framework
         private static void AutoInitialize()
         {
             // 直接获取或创建实例并初始化
-            var framework = FrameworkManager.Instance;
+            var framework = DLFrameworkManager.Instance;
             framework?.Initialize();
         }
 
@@ -23,9 +23,9 @@ namespace com.dl.framework
         {
             if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode)
             {
-                if (FrameworkManager.Instance != null)
+                if (DLFrameworkManager.Instance != null)
                 {
-                    Destroy(FrameworkManager.Instance.gameObject);
+                    Destroy(DLFrameworkManager.Instance.gameObject);
                 }
             }
         }

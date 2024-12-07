@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace com.dl.framework
 {
-    public class FrameworkManager : MonoSingleton<FrameworkManager>
+    public class DLFrameworkManager : MonoSingleton<DLFrameworkManager>
     {
         protected override void OnInit()
         {
@@ -11,6 +11,7 @@ namespace com.dl.framework
 
         private void InitializeManagers()
         {
+            DLLogger.Log("DLFramework initializing...");
             try
             {
                 // 事件系统

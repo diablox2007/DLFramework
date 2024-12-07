@@ -20,7 +20,7 @@ namespace com.dl.framework
 
         protected override void OnInit()
         {
-            DLLogger.Log($"[{GetType().Name}] initialized.");
+            base.OnInit();
         }
 
         #region 添加监听

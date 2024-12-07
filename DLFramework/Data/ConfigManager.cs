@@ -1,89 +1,166 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Reflection;
 
 namespace com.dl.framework
 {
+    /// <summary>
+    /// 配置路径特性，用于标记配置类并指定配置文件名称
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ConfigPathAttribute : Attribute
+    {
+        /// <summary>
+        /// 配置文件名称
+        /// </summary>
+        public string ConfigName { get; }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="configName">配置文件名称，不需要包含扩展名</param>
+        public ConfigPathAttribute(string configName)
+        {
+            ConfigName = configName;
+        }
+    }
+
+    /// <summary>
+    /// 配置基类，所有配置类都应继承此类
+    /// </summary>
+    public abstract class ConfigBase : ScriptableObject
+    {
+        /// <summary>
+        /// 配置版本号
+        /// </summary>
+        public string configVersion = "1.0";
+
+        /// <summary>
+        /// 最后修改时间
+        /// </summary>
+        public string lastModifiedTime;
+
+        /// <summary>
+        /// 配置加载完成后的回调
+        /// </summary>
+        public virtual void OnConfigLoaded() { }
+
+        /// <summary>
+        /// Unity序列化验证回调
+        /// </summary>
+        protected virtual void OnValidate()
+        {
+            lastModifiedTime = DateTime.Now.ToString();
+        }
+    }
+
+    /// <summary>
+    /// 配置管理器，负责所有配置文件的加载和管理
+    /// </summary>
     public class ConfigManager : Singleton<ConfigManager>
     {
-        private Dictionary<Type, object> configCache = new Dictionary<Type, object>();
+        /// <summary>
+        /// 配置缓存字典
+        /// </summary>
+        private Dictionary<Type, ConfigBase> configCache = new Dictionary<Type, ConfigBase>();
 
+        /// <summary>
+        /// 初始化配置管理器
+        /// </summary>
         protected override void OnInit()
         {
             LoadAllConfigs();
-            DLLogger.Log($"[{GetType().Name}] initialized.");
         }
 
+        /// <summary>
+        /// 加载所有配置
+        /// </summary>
         private void LoadAllConfigs()
         {
-            // 预加载常用配置
-            LoadConfig<GameConfig>();
-            //LoadConfig<ItemConfig>();
-            //LoadConfig<CharacterConfig>();
-            // 添加其他配置...
+            try
+            {
+                // 从Resources/Configs目录加载所有配置文件
+                var configs = Resources.LoadAll<ConfigBase>("Configs");
+                foreach (var config in configs)
+                {
+                    var type = config.GetType();
+                    configCache[type] = config;
+                    config.OnConfigLoaded();
+                    DLLogger.Log($"[ConfigManager] Loaded config: {type.Name}");
+                }
+
+                DLLogger.Log($"[ConfigManager] Successfully loaded {configCache.Count} configs");
+            }
+            catch (Exception e)
+            {
+                DLLogger.LogError($"[ConfigManager] Failed to load configs: {e}");
+            }
         }
 
-        public T GetConfig<T>() where T : ScriptableObject
+        /// <summary>
+        /// 获取指定类型的配置
+        /// </summary>
+        /// <typeparam name="T">配置类型</typeparam>
+        /// <returns>配置实例</returns>
+        public T GetConfig<T>() where T : ConfigBase
         {
-            Type type = typeof(T);
-
-            if (configCache.TryGetValue(type, out object config))
+            if (configCache.TryGetValue(typeof(T), out var config))
             {
                 return config as T;
             }
 
-            return LoadConfig<T>();
+            DLLogger.LogWarning($"[ConfigManager] Config not found: {typeof(T).Name}");
+            return null;
         }
 
-        private T LoadConfig<T>() where T : ScriptableObject
-        {
-            string configPath = $"Configs/{typeof(T).Name}";
-            T config = Resources.Load<T>(configPath);
-
-            if (config == null)
-            {
-                DLLogger.LogError($"Failed to load config: {configPath}");
-                return null;
-            }
-
-            configCache[typeof(T)] = config;
-            DLLogger.Log($"Loaded config: {typeof(T).Name}");
-            return config;
-        }
-
-        public void ReloadConfig<T>() where T : ScriptableObject
+        /// <summary>
+        /// 重新加载指定类型的配置
+        /// </summary>
+        /// <typeparam name="T">配置类型</typeparam>
+        public void ReloadConfig<T>() where T : ConfigBase
         {
             Type type = typeof(T);
-            if (configCache.ContainsKey(type))
+            var attr = type.GetCustomAttributes(typeof(ConfigPathAttribute), false);
+            if (attr.Length == 0)
             {
-                configCache.Remove(type);
+                DLLogger.LogError($"[ConfigManager] Config {type.Name} missing ConfigPath attribute");
+                return;
             }
-            LoadConfig<T>();
+
+            var configPath = $"Configs/{(attr[0] as ConfigPathAttribute).ConfigName}";
+            var config = Resources.Load<T>(configPath);
+
+            if (config != null)
+            {
+                configCache[type] = config;
+                config.OnConfigLoaded();
+                DLLogger.Log($"[ConfigManager] Reloaded config: {type.Name}");
+            }
+            else
+            {
+                DLLogger.LogError($"[ConfigManager] Failed to reload config: {type.Name}");
+            }
         }
 
-        public void ClearCache()
+        /// <summary>
+        /// 重新加载所有配置
+        /// </summary>
+        public void ReloadAllConfigs()
         {
             configCache.Clear();
             Resources.UnloadUnusedAssets();
+            LoadAllConfigs();
         }
-    }
 
-    // 配置基类示例
-    public abstract class ConfigBase : ScriptableObject
-    {
-        public string version;
-        public string description;
-    }
-
-    // 游戏配置示例
-    [CreateAssetMenu(fileName = "GameConfig", menuName = "DLFramework/Configs/GameConfig")]
-    public class GameConfig : ConfigBase
-    {
-        public float musicVolume = 1.0f;
-        public float soundVolume = 1.0f;
-        public bool vibrationEnabled = true;
-        public string defaultLanguage = "en";
-        public int targetFrameRate = 60;
-        // 其他游戏配置...
+        /// <summary>
+        /// 清理配置缓存
+        /// </summary>
+        public void ClearConfigCache()
+        {
+            configCache.Clear();
+            Resources.UnloadUnusedAssets();
+            DLLogger.Log("[ConfigManager] Config cache cleared");
+        }
     }
 }

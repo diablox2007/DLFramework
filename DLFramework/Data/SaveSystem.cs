@@ -20,7 +20,6 @@ namespace com.dl.framework
                 {
                     Directory.CreateDirectory(folderPath);
                 }
-
                 string filePath = Path.Combine(folderPath, fileName + ".json");
                 string jsonData = JsonUtility.ToJson(data);
                 string encryptedData = EncryptString(jsonData);

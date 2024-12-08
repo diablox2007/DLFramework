@@ -13,12 +13,30 @@ namespace com.dl.framework.editor
         protected virtual void OnEnable()
         {
             // 现在编译器知道 T 是一个具体的类类型
-            targetModule = DataManager.Instance.GetModule<T>();
+            // 直接从存档加载数据，不依赖 DataManager
+            targetModule = LoadModuleData();
             if (targetModule == null)
             {
                 targetModule = new T();
                 targetModule.Initialize();
             }
+        }
+
+        // 编辑器专用的数据加载方法
+        private T LoadModuleData()
+        {
+            try
+            {
+                if (SaveSystem.HasData(typeof(T).Name))
+                {
+                    return SaveSystem.LoadData<T>(typeof(T).Name);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to load editor data: {e.Message}");
+            }
+            return null;
         }
 
         protected virtual void OnGUI()

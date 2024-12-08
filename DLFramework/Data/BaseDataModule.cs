@@ -18,7 +18,7 @@ namespace com.dl.framework
             try
             {
                 SaveSystem.SaveData(FileName, this);
-                DLLogger.Log($"[{GetType().Name}] Saved successfully");
+                //DLLogger.Log($"[{GetType().Name}] Saved successfully");
             }
             catch (Exception e)
             {
@@ -42,7 +42,7 @@ namespace com.dl.framework
                         // 将加载的数据复制到当前实例
                         var json = JsonUtility.ToJson(loadedData);
                         JsonUtility.FromJsonOverwrite(json, this);
-                        DLLogger.Log($"[{GetType().Name}] Loaded successfully");
+                        //DLLogger.Log($"[{GetType().Name}] Loaded successfully");
                     }
                 }
                 else
